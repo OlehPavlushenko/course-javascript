@@ -13,7 +13,7 @@
  Другими словами: функция должна возвращать в неизменном виде то, что поступает ей на вход
  */
 function returnFirstArgument(value) {
-  return console.log(value);
+  return value;
 }
 returnFirstArgument(10);
 returnFirstArgument('Oleh');
@@ -31,9 +31,9 @@ returnFirstArgument('Oleh');
  Пример:
    sumWithDefaults(10) вернет 110
  */
-function sumWithDefaults(a, b) {
+function sumWithDefaults(a, b = 100) {
   const sum = a + b;
-  return console.log(sum);
+  return sum;
 }
 sumWithDefaults(13, 12);
 /*
@@ -45,11 +45,9 @@ sumWithDefaults(13, 12);
    returnFnResult(() => 'привет') вернет 'привет'
  */
 function returnFnResult(fn) {
-  fn();
+  return fn();
 }
-returnFnResult(function () {
-  console.log('Hello');
-});
+
 /*
  Задание 4:
 
@@ -64,8 +62,8 @@ returnFnResult(function () {
    console.log(f()); // выведет 13
  */
 function returnCounter(number) {
-  return function fn() {
-    return number++;
+  return function () {
+    return ++number;
   };
 }
 const f = returnCounter(10);
@@ -90,6 +88,11 @@ function returnArgumentsArray() {
   }
   return array;
 }
+/*
+//Оператор spread и rest
+function returnArgumentsArray(...args) {
+  return args;
+}*/
 //var newArray = returnArgumentsArray(1, 2, 3, 22, 'Oleh');
 //console.log(newArray);
 
@@ -108,8 +111,19 @@ function returnArgumentsArray() {
 
    console.log(newSum()) выведет 6
  */
+function sum(a, b) {
+  return a + b;
+}
 
-function bindFunction(fn) {}
+function bindFunction(sum, ...args) {
+  return function () {
+    return sum(...args);
+  };
+}
+
+const newSum = bindFunction(sum, 2, 4);
+
+console.log(newSum());
 
 export {
   returnFirstArgument,
