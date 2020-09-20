@@ -32,7 +32,6 @@ returnFirstArgument('Oleh');
    sumWithDefaults(10) вернет 110
  */
 function sumWithDefaults(a, b = 100) {
-  const sum = a + b;
   return sum;
 }
 sumWithDefaults(13, 12);
@@ -79,23 +78,19 @@ console.log(f());
  Пример:
    returnArgumentsArray(1, 2, 3) вернет [1, 2, 3]
  */
-function returnArgumentsArray() {
-  //console.log(arguments);
+/*function returnArgumentsArray() {
   const array = [];
   for (let i = 0; i < arguments.length; i++) {
-    //console.log(arguments[i]);
     array[i] = arguments[i];
   }
   return array;
-}
-/*
+}*/
+
 //Оператор spread и rest
+
 function returnArgumentsArray(...args) {
   return args;
-}*/
-//var newArray = returnArgumentsArray(1, 2, 3, 22, 'Oleh');
-//console.log(newArray);
-
+}
 /*
  Задание 6 *:
 
@@ -116,9 +111,7 @@ function sum(a, b) {
 }
 
 function bindFunction(sum, ...args) {
-  return function () {
-    return sum(...args);
-  };
+  return sum.bind(null, ...args);
 }
 
 const newSum = bindFunction(sum, 2, 4);
