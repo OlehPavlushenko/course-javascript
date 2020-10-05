@@ -11,6 +11,9 @@
    createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
 function createDivWithText(text) {
+  const element = document.createElement('div');
+    element.textContent = text;
+    document.body.appendChild(element);
 }
 
 /*
@@ -22,6 +25,7 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
+  where.insertBefore(what, where.firstChild);
 }
 
 /*
@@ -44,6 +48,15 @@ function prepend(what, where) {
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
+  let arr = [];
+  for (const nodes of where.children) {
+    if (nodes.nextElementSibling !== null ) {
+      if ( nodes.nextElementSibling.localName === 'p' ) {
+        arr.push(nodes);
+      }
+    }
+  }
+  return arr;
 }
 
 /*
@@ -65,11 +78,11 @@ function findAllPSiblings(where) {
  */
 function findError(where) {
   const result = [];
-
-  for (const child of where.childNodes) {
-    result.push(child.textContent);
-  }
-
+    for (const child of where.childNodes) {
+      if ( child.nodeType === 1 && child.localName === 'div' && child.children.length === 0  && child.childNodes.length > 0 ) {
+        result.push(child.textContent);
+      }
+    }
   return result;
 }
 
@@ -86,6 +99,11 @@ function findError(where) {
    должно быть преобразовано в <div></div><p></p>
  */
 function deleteTextNodes(where) {
+  for (const child of where.childNodes) {
+    if ( child.nodeType === 3 ) {
+      child.remove();
+    }
+  }
 }
 
 /*
@@ -100,6 +118,14 @@ function deleteTextNodes(where) {
    должно быть преобразовано в <span><div><b></b></div><p></p></span>
  */
 function deleteTextNodesRecursive(where) {
+  for (let index = 0; index < where.childNodes.length; index++) {
+    let element = where.childNodes[index];
+    if (element.nodeType === 3) {
+      where.removeChild(element);
+    }else if (element.nodeType === 1 && element.localName !== 'script' ) {
+      deleteTextNodesRecursive(element);
+    }
+  }
 }
 
 /*
@@ -123,6 +149,43 @@ function deleteTextNodesRecursive(where) {
    }
  */
 function collectDOMStat(root) {
+  
+  let statistic = {
+    classes : {},
+    tags : {},
+    texts : 0,
+  };
+
+  function iteration (root) {
+    for (let index = 0; index < root.childNodes.length; index++) {
+      const element = root.childNodes[index];
+      
+      if (element.nodeType === 3) {
+        statistic.texts++;
+        
+      }else if (element.nodeType === 1 && element.localName !== 'script' ) {
+
+
+        if( element.tagName in statistic.tags ){
+          statistic.tags[element.tagName]++
+        } else {
+          statistic.tags[element.tagName] = 1;
+        }
+
+        for (const iterator of element.classList) {
+          if( iterator in statistic.classes ){
+            statistic.classes[iterator]++
+          } else {
+            statistic.classes[iterator] = 1;       
+          }
+        }
+      }
+      iteration (element);
+    }
+  }
+  
+  iteration (root);
+  return statistic;
 }
 
 /*
@@ -158,6 +221,26 @@ function collectDOMStat(root) {
    }
  */
 function observeChildNodes(where, fn) {
+  let target = where;
+  const config = {
+    attributes: true,
+    childList: true,
+    subtree: true
+  }; 
+  const callback = function(mutationsList, observer) {
+    for (let mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        console.log(mutation);
+        fn({
+          type : mutation.addedNodes.length ? 'insert':'remove',
+          nodes: [...( mutation.addedNodes.length ? mutation.addedNodes:mutation.removedNodes )]
+        })
+      } 
+    }
+  };
+  const observer = new MutationObserver(callback);
+  observer.observe(target, config);
+  
 }
 
 export {
