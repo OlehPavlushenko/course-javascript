@@ -50,10 +50,8 @@ function prepend(what, where) {
 function findAllPSiblings(where) {
   let arr = [];
   for (const nodes of where.children) {
-    if (nodes.nextElementSibling !== null ) {
-      if ( nodes.nextElementSibling.localName === 'p' ) {
-        arr.push(nodes);
-      }
+    if ( nodes.nextElementSibling.tagName === 'P' ) {
+      arr.push(nodes);
     }
   }
   return arr;
@@ -157,6 +155,7 @@ function collectDOMStat(root) {
   };
 
   function iteration (root) {
+    
     for (let index = 0; index < root.childNodes.length; index++) {
       const element = root.childNodes[index];
       
@@ -180,7 +179,9 @@ function collectDOMStat(root) {
           }
         }
       }
-      iteration (element);
+      if (element.childElementCount > 0) {
+        iteration (element);
+      }
     }
   }
   
