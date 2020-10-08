@@ -9,6 +9,7 @@
    addListener('click', document.querySelector('a'), () => console.log('...')) // должна добавить указанный обработчик кликов на указанный элемент
  */
 function addListener(eventName, target, fn) {
+  target.addEventListener(eventName,fn)
 }
 
 /*
@@ -20,6 +21,7 @@ function addListener(eventName, target, fn) {
    removeListener('click', document.querySelector('a'), someHandler) // должна удалить указанный обработчик кликов на указанный элемент
  */
 function removeListener(eventName, target, fn) {
+  target.removeEventListener(eventName, fn);
 }
 
 /*
@@ -31,6 +33,9 @@ function removeListener(eventName, target, fn) {
    skipDefault('click', document.querySelector('a')) // после вызова функции, клики на указанную ссылку не должны приводить к переходу на другую страницу
  */
 function skipDefault(eventName, target) {
+  target.addEventListener(eventName,(event) => {
+    event.preventDefault();
+  })
 }
 
 /*
@@ -42,6 +47,8 @@ function skipDefault(eventName, target) {
    emulateClick(document.querySelector('a')) // для указанного элемента должно быть симулировано события click
  */
 function emulateClick(target) {
+  var clickEvent = new Event( 'click' );
+  target.dispatchEvent( clickEvent );
 }
 
 /*
@@ -53,7 +60,13 @@ function emulateClick(target) {
  Пример:
    delegate(document.body, () => console.log('кликнули на button')) // добавит такой обработчик кликов для body, который будет вызывать указанную функцию только если кликнули на кнопку (элемент с тегом button)
  */
-function delegate(target, fn) {
+function delegate(target,fn) {
+  target.addEventListener('click', function(event){
+    event.preventDefault();
+    if (event.target.tagName === 'BUTTON') {
+      fn();
+    }
+  })
 }
 
 /*
@@ -66,6 +79,19 @@ function delegate(target, fn) {
    once(document.querySelector('button'), () => console.log('обработчик выполнился!')) // добавит такой обработчик кликов для указанного элемента, который вызовется только один раз и затем удалится
  */
 function once(target, fn) {
+  let flag = 1;
+  target.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (flag) {
+      fn();
+      flag = 0;
+    }
+    target.removeEventListener('click', (e)=> e);
+   
+    console.log(flag);
+  })
+  
+  
 }
 
 export { addListener, removeListener, skipDefault, emulateClick, delegate, once };
