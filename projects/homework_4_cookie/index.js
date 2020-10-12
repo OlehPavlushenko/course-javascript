@@ -33,23 +33,106 @@ import './cookie.html';
    const newDiv = document.createElement('div');
    homeworkContainer.appendChild(newDiv);
  */
-const homeworkContainer = document.querySelector('#homework-container');
+const homeworkContainer = document.querySelector('#app');
 // текстовое поле для фильтрации cookie
-const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
+const filterNameInput = document.querySelector('#filter-name-input');
 // текстовое поле с именем cookie
-const addNameInput = homeworkContainer.querySelector('#add-name-input');
+const addNameInput = document.querySelector('#add-name-input');
 // текстовое поле со значением cookie
-const addValueInput = homeworkContainer.querySelector('#add-value-input');
+const addValueInput = document.querySelector('#add-value-input');
 // кнопка "добавить cookie"
-const addButton = homeworkContainer.querySelector('#add-button');
+const addButton = document.querySelector('#add-button');
 // таблица со списком cookie
-const listTable = homeworkContainer.querySelector('#list-table tbody');
+const listTable = document.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('input', function () {
-});
+filterNameInput.addEventListener('input', function() {});
 
-addButton.addEventListener('click', () => {
-});
+console.log(document.cookie);
+if (addButton) {
 
-listTable.addEventListener('click', (e) => {
-});
+    function getCookie() {
+
+        let listCookie = {};
+        const decodedCookie = decodeURIComponent(document.cookie).split('; ');
+        for (let index = 0; index < decodedCookie.length; index++) {
+            const [name, value] = decodedCookie[index].split('=');
+            if (name !== 'PHPSESSID') {
+                listCookie[name] = value;
+            }
+        }
+        return listCookie;
+
+    }
+
+    addButton.addEventListener('click', () => {
+        let cookieName = addNameInput.value;
+        let cookieValue = addValueInput.value;
+
+        if (cookieName in listCookie) {
+            alert(listCookie[cookieName]);
+            document.cookie = encodeURIComponent(cookieName) + '=';
+            document.cookie = encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue);
+
+            for (let row of listTable.rows) {
+                for (let cell of row.cells) {
+                    if (cookieName === cell.innerText) {
+                        cell.nextElementSibling.textContent = cookieValue
+                    }
+
+                }
+            }
+
+        } else {
+            if (cookieName && cookieValue) {
+                document.cookie = encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue);
+
+                let row = document.createElement("tr");
+                const createNew = listTable.appendChild(row);
+                createNew.innerHTML = `<td>${cookieName}</td><td> ${cookieValue} </td><td><button>Delete</button></td>`;
+
+                addNameInput.value = '';
+                addValueInput.value = '';
+
+            }
+        }
+
+    });
+
+
+}
+
+//insert all notes to table
+const listCookie = getCookie();
+for (const key in listCookie) {
+    if (listCookie.hasOwnProperty(key)) {
+
+        const value = listCookie[key];
+        let row = document.createElement("tr");
+        const createNew = listTable.appendChild(row);
+
+        createNew.innerHTML = `<td>${key}</td><td> ${value} </td><td><button>Delete</button></td>`;
+
+    }
+}
+
+if (listTable) {
+
+    function removeCookie(sKey, sPath, sDomain) {
+        document.cookie = encodeURIComponent(sKey) +
+            "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" +
+            (sDomain ? "; domain=" + sDomain : "") +
+            (sPath ? "; path=" + sPath : "");
+    }
+
+
+    listTable.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (e.target.tagName === 'BUTTON') {
+            e.target.parentElement.parentElement.remove();
+            let nameRemove = e.target.parentElement.previousElementSibling.previousElementSibling.innerText;
+            removeCookie(nameRemove);
+            delete listCookie[nameRemove];
+        }
+    });
+
+}
