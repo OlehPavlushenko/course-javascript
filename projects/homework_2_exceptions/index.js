@@ -16,9 +16,24 @@
    isAllTrue([1, 2, 3, 4, 5], n => n < 10) // вернет true
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
-function isAllTrue(array, fn) {
-}
 
+function isAllTrue(array, fn) {
+  if (typeof fn !== "function") {
+    throw new Error ('fn is not a function');
+  } 
+  if(!Array.isArray(array) || !array.length){
+    throw new Error ('empty array');
+  }
+  for (let index = 0; index < array.length; index++) {
+    let element = array[index];
+    if(!fn(element)){
+      return false;
+    }
+  }
+  return true;
+}
+//var new = isAllTrue([100, 2, 3, 4, 5], n => n < 10);
+//console.log(new);
 /*
  Задание 2:
 
@@ -36,8 +51,22 @@ function isAllTrue(array, fn) {
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
+  if (typeof fn !== "function") {
+    throw new Error ('fn is not a function');
+  } 
+  if(!Array.isArray(array) || !array.length){
+    throw new Error ('empty array');
+  }
+  for (let index = 0; index < array.length; index++) {
+    let element = array[index];
+    if(fn(element)){
+      return true;
+    }
+  }
+  return false;
 }
-
+//var new = isSomeTrue([1, 2, 3, 4, 5], n => n > 20);
+//console.log(new);
 /*
  Задание 3:
 
@@ -50,8 +79,21 @@ function isSomeTrue(array, fn) {
    - fn не является функцией (с текстом "fn is not a function")
  */
 function returnBadArguments(fn, ...args) {
+  if (typeof fn !== "function") {
+    throw new Error ('fn is not a function');
+  } 
+  var array = [];
+  for (const arg of args) {
+    try {
+      fn(arg);
+    } catch (error) {
+      array.push(arg);
+    }
+  }
+  return array;
 }
-
+//var newSum = returnBadArguments(() => n, 2, 3);
+//console.log(newSum);
 /*
  Задание 4:
 
@@ -69,8 +111,53 @@ function returnBadArguments(fn, ...args) {
    - number не является числом (с текстом "number is not a number")
    - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
+var Object = {};
 function calculator(number = 0) {
+  console.log(number);
+  if ( !Number.isFinite(number)) {
+    throw new Error ('number is not a number');
+  } 
+  
+
+  Object['sum'] = function sum(...args) {
+    let sum = number;
+    for (const arg of args) {
+      sum += arg;
+    }
+    return sum 
+   
+  }
+  Object['dif'] = function dif(...args) {
+    let dif = number;
+    for (const arg of args) {
+      dif -= arg;
+    }
+    return dif 
+  }
+  Object['div'] = function div(...args) {
+    let div = number;
+    for (const arg of args) {
+      if ( arg === 0) {
+        throw new Error ('division by 0');
+      } 
+      div /= arg;
+    }
+    return div 
+  }
+  Object['mul'] = function mul(...args) {
+    let mul = number;
+    for (const arg of args) {
+      if ( arg === 0) {
+        throw new Error ('division by 0');
+      } 
+      mul *= arg;
+    }
+    return mul 
+  }
+
+  return Object;
 }
+
 
 /* При решении задач, постарайтесь использовать отладчик */
 
