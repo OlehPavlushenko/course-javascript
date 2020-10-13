@@ -33,43 +33,65 @@ import './cookie.html';
    const newDiv = document.createElement('div');
    homeworkContainer.appendChild(newDiv);
  */
-const homeworkContainer = document.querySelector('#app');
-// текстовое поле для фильтрации cookie
-const filterNameInput = document.querySelector('#filter-name-input');
-// текстовое поле с именем cookie
-const addNameInput = document.querySelector('#add-name-input');
-// текстовое поле со значением cookie
-const addValueInput = document.querySelector('#add-value-input');
-// кнопка "добавить cookie"
-const addButton = document.querySelector('#add-button');
-// таблица со списком cookie
-const listTable = document.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('input', function() {});
-
-console.log(document.cookie);
-if (addButton) {
-
-    function getCookie() {
-
-        let listCookie = {};
-        const decodedCookie = decodeURIComponent(document.cookie).split('; ');
-        for (let index = 0; index < decodedCookie.length; index++) {
-            const [name, value] = decodedCookie[index].split('=');
-            if (name !== 'PHPSESSID') {
-                listCookie[name] = value;
-            }
-        }
-        return listCookie;
-
+filterNameInput.addEventListener('input', function(e) {
+    if (this.value !== '') {
+        updateFilter(this.value);
+    } else {
+        listTable.innerHTML = '';
+        insert()
     }
 
+});
+
+
+function isMatching(full, chunk) {
+    return full.includes(chunk);
+}
+
+function updateFilter(filterValue) {
+
+    listTable.innerHTML = '';
+
+    for (const list in listCookie) {
+        console.log(list);
+
+        if (filterValue && isMatching(list, filterValue)) {
+
+            let row = document.createElement("tr");
+            const createNew = listTable.appendChild(row);
+
+            createNew.innerHTML = `<td>${list}</td><td> ${listCookie[list]} </td><td><button>Delete</button></td>`;
+        }
+    }
+
+}
+
+function getCookie() {
+
+    let listCookie = {};
+    const decodedCookie = decodeURIComponent(document.cookie).split('; ');
+    for (let index = 0; index < decodedCookie.length; index++) {
+        const [name, value] = decodedCookie[index].split('=');
+        if (name !== 'PHPSESSID') {
+            listCookie[name] = value;
+        }
+    }
+    return listCookie;
+
+}
+
+const listCookie = getCookie();
+
+if (addButton) {
+
     addButton.addEventListener('click', () => {
+
         let cookieName = addNameInput.value;
         let cookieValue = addValueInput.value;
 
         if (cookieName in listCookie) {
-            alert(listCookie[cookieName]);
+
             document.cookie = encodeURIComponent(cookieName) + '=';
             document.cookie = encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue);
 
@@ -85,7 +107,7 @@ if (addButton) {
         } else {
             if (cookieName && cookieValue) {
                 document.cookie = encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue);
-
+                listCookie[cookieName] = cookieValue;
                 let row = document.createElement("tr");
                 const createNew = listTable.appendChild(row);
                 createNew.innerHTML = `<td>${cookieName}</td><td> ${cookieValue} </td><td><button>Delete</button></td>`;
@@ -101,19 +123,22 @@ if (addButton) {
 
 }
 
-//insert all notes to table
-const listCookie = getCookie();
-for (const key in listCookie) {
-    if (listCookie.hasOwnProperty(key)) {
+function insert() {
 
-        const value = listCookie[key];
-        let row = document.createElement("tr");
-        const createNew = listTable.appendChild(row);
+    for (const key in listCookie) {
+        if (listCookie.hasOwnProperty(key)) {
 
-        createNew.innerHTML = `<td>${key}</td><td> ${value} </td><td><button>Delete</button></td>`;
+            const value = listCookie[key];
+            let row = document.createElement("tr");
+            const createNew = listTable.appendChild(row);
 
+            createNew.innerHTML = `<td>${key}</td><td> ${value} </td><td><button>Delete</button></td>`;
+
+        }
     }
 }
+
+insert();
 
 if (listTable) {
 
@@ -127,7 +152,7 @@ if (listTable) {
 
     listTable.addEventListener('click', (e) => {
         e.preventDefault();
-        if (e.target.tagName === 'BUTTON') {
+        if (event.target.tagName === 'BUTTON') {
             e.target.parentElement.parentElement.remove();
             let nameRemove = e.target.parentElement.previousElementSibling.previousElementSibling.innerText;
             removeCookie(nameRemove);
