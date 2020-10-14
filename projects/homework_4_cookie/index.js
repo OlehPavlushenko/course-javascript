@@ -34,6 +34,18 @@ import './cookie.html';
    homeworkContainer.appendChild(newDiv);
  */
 
+const homeworkContainer = document.querySelector('#app');
+// текстовое поле для фильтрации cookie
+const filterNameInput = document.querySelector('#filter-name-input');
+// текстовое поле с именем cookie
+const addNameInput = document.querySelector('#add-name-input');
+// текстовое поле со значением cookie
+const addValueInput = document.querySelector('#add-value-input');
+// кнопка "добавить cookie"
+const addButton = document.querySelector('#add-button');
+// таблица со списком cookie
+const listTable = document.querySelector('#list-table tbody');
+
 filterNameInput.addEventListener('input', function(e) {
     if (this.value !== '') {
         updateFilter(this.value);
@@ -54,7 +66,6 @@ function updateFilter(filterValue) {
     listTable.innerHTML = '';
 
     for (const list in listCookie) {
-        console.log(list);
 
         if (filterValue && isMatching(list, filterValue)) {
 
@@ -67,20 +78,18 @@ function updateFilter(filterValue) {
 
 }
 
+
 function getCookie() {
 
     let listCookie = {};
     const decodedCookie = decodeURIComponent(document.cookie).split('; ');
     for (let index = 0; index < decodedCookie.length; index++) {
         const [name, value] = decodedCookie[index].split('=');
-        if (name !== 'PHPSESSID') {
-            listCookie[name] = value;
-        }
+        listCookie[name] = value;
     }
     return listCookie;
 
 }
-
 const listCookie = getCookie();
 
 if (addButton) {
