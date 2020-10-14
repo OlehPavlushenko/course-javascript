@@ -69,10 +69,7 @@ function updateFilter(filterValue) {
 
         if (filterValue && isMatching(list, filterValue)) {
 
-            let row = document.createElement("tr");
-            const createNew = listTable.appendChild(row);
-
-            createNew.innerHTML = `<td>${list}</td><td> ${listCookie[list]} </td><td><button>Delete</button></td>`;
+            createTable(list, listCookie[list]);
         }
     }
 
@@ -117,10 +114,7 @@ if (addButton) {
             if (cookieName && cookieValue) {
                 document.cookie = encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue);
                 listCookie[cookieName] = cookieValue;
-                let row = document.createElement("tr");
-                const createNew = listTable.appendChild(row);
-                createNew.innerHTML = `<td>${cookieName}</td><td> ${cookieValue} </td><td><button>Delete</button></td>`;
-
+                createTable(cookieName, cookieValue);
                 addNameInput.value = '';
                 addValueInput.value = '';
 
@@ -138,16 +132,43 @@ function insert() {
         if (listCookie.hasOwnProperty(key)) {
 
             const value = listCookie[key];
-            let row = document.createElement("tr");
-            const createNew = listTable.appendChild(row);
 
-            createNew.innerHTML = `<td>${key}</td><td> ${value} </td><td><button>Delete</button></td>`;
+            createTable(key, value);
+
+            //let row = document.createElement("tr");
+            //const createNew =  listTable.appendChild(row);
+
+            //createNew.innerHTML = `<td>${key}</td><td> ${value} </td><td><button>Delete</button></td>`;
 
         }
     }
 }
 
 insert();
+
+function createTable(paramName, paramValue) {
+    const fragment = document.createDocumentFragment();
+
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td");
+    const tdValue = document.createElement("td");
+    const tdButton = document.createElement("td");
+
+    const buttonDelete = document.createElement("button");
+    buttonDelete.dataset.paramName = paramName;
+    buttonDelete.textContent = 'delete';
+
+    tdName.textContent = paramName;
+    tdValue.textContent = paramValue;
+    tdValue.classList.add(paramValue);
+
+    tr.append(tdName, tdValue, tdButton);
+    tdButton.append(buttonDelete);
+
+    fragment.append(tr);
+    listTable.appendChild(fragment);
+
+}
 
 if (listTable) {
 
@@ -163,7 +184,7 @@ if (listTable) {
         e.preventDefault();
         if (event.target.tagName === 'BUTTON') {
             e.target.parentElement.parentElement.remove();
-            let nameRemove = e.target.parentElement.previousElementSibling.previousElementSibling.innerText;
+            let nameRemove = e.target.dataset.paramName;
             removeCookie(nameRemove);
             delete listCookie[nameRemove];
         }
